@@ -82,9 +82,9 @@ class Instructor():
     def unlearning(self):
         report_results = PrettyTable()
         report_results.field_names = ['Snapshot', 'Time', 'MRR+', 'Hits@1+', 'Hits@10+', 'MRR-', 'Hits@1-', 'Hits@10-']
-        training_times = [] # 记录训练时间
+        training_times = []
 
-        # """ 测试初始模型性能 """
+
         # self.args.snapshot = 0
         # self.args.snapshot_test = 0
         # self.args.snapshot_valid = 0
@@ -104,26 +104,26 @@ class Instructor():
             if self.args.unlearning_method == "repretrain":
                 self.model, self.optimizer = self.reset_model()
 
-            """ 优化采样 """
+            """ Sampling """
             if self.args.unlearning_method == "GraphDPO":
                 self.model.save_embeddings()
                 self.dpo_sample()
 
-            """ 开始训练 """
+            """ training """
             if self.args.unlearning_method != "Before":
                 training_time = self.train()
                 print(f"Snapshot {self.args.snapshot} training time is {training_time}.")
             else:
                 training_time = 0.0
 
-            """ 保存并重新加载模型 """
+            """ save and load model """
             if self.args.unlearning_method != "Before":
                 best_checkpoint = os.path.join(
                     self.args.unlearning_save_path, f'{str(ss_id)}model_best.tar'
                 )
                 self.load_checkpoint(best_checkpoint)
 
-            """ 预测 """
+            """ predict """
             forget_res, reserve_res = self.test()
             print("The performance of unleanring model:")
             print("Performance of forget data:")
@@ -131,7 +131,7 @@ class Instructor():
             print("Performace of reserve data:")
             print(reserve_res)
 
-            """ 输出测试结果 """
+            """ output """
             report_results.add_row([
                 self.args.snapshot,
                 training_time,
@@ -142,10 +142,10 @@ class Instructor():
                 forget_res["hits1"],
                 forget_res["hits10"]
             ])
-            self.args.logger.info(f"\n{report_results}") # 记录本次snapshot数据
+            self.args.logger.info(f"\n{report_results}")
             training_times.append(training_time)
 
-        """ 输出最终结果 """
+        """ final results """
         self.args.logger.info(f'Report Result:\n{report_results}')
         self.args.logger.info(f'Sum_Training_Time:{sum(training_times)}')
         self.args.logger.info(f'Every_Training_Time:{training_times}')
@@ -220,7 +220,7 @@ class Instructor():
 
     def save_model(self, is_best=False):
         checkpoint_dict = {'state_dict': self.model.state_dict()}
-        checkpoint_dict['epoch_id'] = self.args.epoch # 存其他信息
+        checkpoint_dict['epoch_id'] = self.args.epoch
         out_tar = os.path.join(
             self.args.unlearning_save_path,
             f'{str(self.args.snapshot)}checkpoint-{self.args.epoch}.tar',

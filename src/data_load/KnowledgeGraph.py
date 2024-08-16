@@ -100,12 +100,12 @@ class UnlearningData(PretrainData):
 class Snapshot():
     def __init__(self, args) -> None:
         self.args = args
-        self.forgotten_triples = [] # 本次遗忘的三元组
-        self.forgotten_entities = [] # 本次遗忘的实体
-        self.accumulate_forgotten_triples = [] # 累计遗忘的三元组
-        self.is_heads = [] # 遗忘的实体是否是头实体
-        self.reserve_triples = [] # 保留三元组
-        self.forgotten_num = 0 # 本次遗忘的三元组数量
-        self.acc_forgotten_num = 0 # 累计遗忘的三元组数量
-        self.reserve_num = 0 # 所有保留三元组的数量
-        self.class_to_forget = [] # (可选:Fisher) 记录所有被遗忘的实体
+        self.forgotten_triples = []
+        self.forgotten_entities = []
+        self.accumulate_forgotten_triples = []
+        self.is_heads = []
+        self.reserve_triples = []
+        self.forgotten_num = 0
+        self.acc_forgotten_num = 0
+        self.reserve_num = 0
+        self.class_to_forget = []

@@ -63,7 +63,7 @@ class TrainDataset(Dataset):
 
 
 class RepreTrainDataset(Dataset):
-    """ 使用保留集进行训练 """
+    """ Use retention sets for training """
     def __init__(self, args, kg) -> None:
         super(RepreTrainDataset, self).__init__()
         self.args = args
@@ -126,7 +126,7 @@ class RepreTrainDataset(Dataset):
 
 
 class NGTrainDataset(Dataset):
-    """ 使用遗忘集进行反向梯度传播 """
+    """ Use the forgetting set for reverse gradient propagation """
     def __init__(self, args, kg) -> None:
         super(NGTrainDataset, self).__init__()
         self.args = args
@@ -189,7 +189,7 @@ class NGTrainDataset(Dataset):
 
 
 class RLTrainDataset(Dataset):
-    """ 对遗忘集使用随机标签 """
+    """ Use random tags for forgotten sets """
     def __init__(self, args, kg) -> None:
         super(RLTrainDataset, self).__init__()
         self.args = args
@@ -257,7 +257,7 @@ class RLTrainDataset(Dataset):
 
 
 class ForgetBoundaryDataset(Dataset):
-    """ 确定遗忘集的遗忘边界 """
+    """ Determine the forgetting boundary of the forgetting set """
     def __init__(self, args, kg) -> None:
         super(ForgetBoundaryDataset, self).__init__()
         self.args = args
@@ -332,7 +332,7 @@ class ForgetBoundaryDataset(Dataset):
 
 
 class GraphDPOTrainDataset(Dataset):
-    """ 对遗忘集使用偏好优化 """
+    """ Use preference optimization for forgotten sets """
     def __init__(self, args, kg) -> None:
         super(GraphDPOTrainDataset, self).__init__()
         self.args = args
@@ -386,7 +386,7 @@ class GraphDPOTrainDataset(Dataset):
             if rt in forgotten_entities:
                 self.entity_distill_mask[rh] = 1
         for i, (h, r, t) in enumerate(self.kg.snapshots[self.args.snapshot].forgotten_triples):
-            """ 通过遗忘边界确定偏好优化的负例 """
+            """ Negative examples of preference optimization are identified by forgetting boundaries """
             snapshot = self.kg.snapshots[self.args.snapshot]
             is_head = snapshot.is_heads[i]
             triples_to_check = random_reserve_dict.get(h if is_head else t, [])

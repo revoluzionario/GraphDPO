@@ -55,11 +55,11 @@ class Instructor():
     def pretrain(self):
         report_results = PrettyTable()
         report_results.field_names = ['Time', 'MRR', 'Hits@1', 'Hits@3', 'Hits@10']
-        test_results = [] # 记录格式化结果
-        training_times = [] # 记录训练时间
+        test_results = []
+        training_times = []
         training_time = self.train()
         """ prepare result table """
-        test_res = PrettyTable() # 格式化记录
+        test_res = PrettyTable()
         test_res.field_names = [
             'MRR',
             'Hits@1',
@@ -68,14 +68,14 @@ class Instructor():
             'Hits@10',
         ]
 
-        """ 保存并重新加载模型 """
+        """ save and load model """
         best_checkpoint = os.path.join(
             self.args.pretrain_save_path, f'model_best.tar'
         )
         self.load_checkpoint(best_checkpoint)
 
-        """ 预测 """
-        res = self.test() # 预测结果
+        """ predict """
+        res = self.test()
         self.args.logger.info(
                     f"MRR:{round(res['mrr'] * 100, 3)}\tHits@1:{round(res['hits1'] * 100, 3)}\tHits@3:{round(res['hits3'] * 100, 3)}\tHits@10:{round(res['hits10'] * 100, 3)}"
                 )
@@ -138,7 +138,7 @@ class Instructor():
 
     def save_model(self, is_best=False):
         checkpoint_dict = {'state_dict': self.model.state_dict()}
-        checkpoint_dict['epoch_id'] = self.args.epoch # 存其他信息
+        checkpoint_dict['epoch_id'] = self.args.epoch
         out_tar = os.path.join(
             self.args.pretrain_save_path,
             f'checkpoint-{self.args.epoch}.tar',

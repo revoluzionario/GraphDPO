@@ -2,7 +2,7 @@ from ..utils import *
 from ..data_load.data_loader import *
 
 class TrainBatchProcessor():
-    """ 正常的训练过程 """
+    """ Normal training process """
     def __init__(self, args, kg) -> None:
         self.args = args
         self.kg = kg
@@ -40,7 +40,7 @@ class TrainBatchProcessor():
 
 
 class NGTrainBatchProcessor():
-    """ 使用反向梯度上升的训练过程 """
+    """ Training process using inverse gradient ascension """
     def __init__(self, args, kg) -> None:
         self.args = args
         self.kg = kg
@@ -77,7 +77,7 @@ class NGTrainBatchProcessor():
 
 
 class RLTrainBatchProcessor():
-    """ 使用随机标签的训练过程 """
+    """ Training process using random labels """
     def __init__(self, args, kg) -> None:
         self.args = args
         self.kg = kg
@@ -275,8 +275,7 @@ class ParameterPerturber:
 
 class SSDTrainBatchProcessor():
     """
-    使用SSD算法的训练过程
-    实现过程参考https://github.com/if-loops/selective-synaptic-dampening/blob/main/src/forget_random_strategies.py
+    SSD: https://github.com/if-loops/selective-synaptic-dampening/blob/main/src/forget_random_strategies.py
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -342,7 +341,7 @@ class SSDTrainBatchProcessor():
 
 
 class GraphDPOTrainBatchProcessor():
-    """ 使用dpo的训练过程 """
+    """ dpo """
     def __init__(self, args, kg) -> None:
         self.args = args
         self.kg = kg
@@ -403,8 +402,7 @@ class GraphDPOTrainBatchProcessor():
 
 class ADVIMPTrainBatchProcessor():
     """
-    使用ADV+IMP的训练过程
-    实现过程参考https://openreview.net/forum?id=z8mVbZIMOjx
+    ADV+IMP: https://openreview.net/forum?id=z8mVbZIMOjx
     """
     def __init__(self, args, kg, model) -> None:
         self.args = args
@@ -567,8 +565,7 @@ class FGSM(AttackBase):
 
 class BSTrainBatchProcessor():
     """
-    使用Boundary Shrink的训练过程
-    实现过程参考https://github.com/TY-LEE-KR/Boundary-Unlearning-Code/blob/master/boundary_unlearning.py
+    Boundary Shrink: https://github.com/TY-LEE-KR/Boundary-Unlearning-Code/blob/master/boundary_unlearning.py
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -670,8 +667,7 @@ class BSTrainBatchProcessor():
 
 class FisherTrainBatchProcessor():
     """
-    使用Fisher提取关键信息的训练过程
-    实现过程参考 https://github.com/AdityaGolatkar/SelectiveForgetting/blob/master/Forgetting.ipynb
+    Fisher: https://github.com/AdityaGolatkar/SelectiveForgetting/blob/master/Forgetting.ipynb
     """
     # def __init__(self, args, kg) -> None:
     #     self.args = args
@@ -700,8 +696,8 @@ class FisherTrainBatchProcessor():
     #         bh, br, bt, by = batch
     #         bh = bh.to(self.args.device)
     #         br = br.to(self.args.device)
-    #         bt = bt.to(self.args.device) # 标签
-    #         by = by.to(self.args.device) # -1 和 1
+    #         bt = bt.to(self.args.device)
+    #         by = by.to(self.args.device) # -1 or 1
     #         output = model.predict(bh, br) # [11, 145541]
     #         prob = F.softmax(output, dim=-1) # [11, 145541]
     #         output_new = torch.argmax(output, dim=1) # [11]
@@ -727,12 +723,12 @@ class FisherTrainBatchProcessor():
         self.data_loader = DataLoader(
             self.dataset,
             shuffle=True,
-            batch_size=1,  # 减少批处理大小
+            batch_size=1,
             collate_fn=self.dataset.collate_fn,
             generator=torch.Generator().manual_seed(int(args.seed)), # use seed generator
             pin_memory=True
         )
-        self.scaler = GradScaler()  # 初始化GradScaler
+        self.scaler = GradScaler()
 
     def hessian(self, dataset, model):
         model.eval()
@@ -742,16 +738,16 @@ class FisherTrainBatchProcessor():
             p.grad_acc = 0
             p.grad2_acc = 0
         MAX_TRAIN_STEP = 3
-        accumulation_steps = 2  # 每两个批处理进行一次梯度更新
+        accumulation_steps = 2
         for b_id, batch in tqdm(enumerate(self.data_loader)):
             if b_id > MAX_TRAIN_STEP:
                 break
             bh, br, bt, by = batch
             bh = bh.to(self.args.device)
             br = br.to(self.args.device)
-            bt = bt.to(self.args.device) # 标签
-            by = by.to(self.args.device) # -1 和 1
-            with autocast():  # 使用混合精度
+            bt = bt.to(self.args.device)
+            by = by.to(self.args.device) # -1 or 1
+            with autocast():
                 output = model.predict(bh, br) # [11, 145541]
                 prob = F.softmax(output, dim=-1) # [11, 145541]
                 output_new = torch.argmax(output, dim=1) # [11]
@@ -760,13 +756,13 @@ class FisherTrainBatchProcessor():
                     loss = model.loss(bh, br, target, by if by is not None else by).float()
                     model.zero_grad()
                     self.scaler.scale(loss).backward(retain_graph=True)
-                    if (b_id + 1) % accumulation_steps == 0:  # 梯度累积步骤
+                    if (b_id + 1) % accumulation_steps == 0:
                         for p in model.parameters():
                             if p.requires_grad:
                                 p.grad_acc += (bt == target).sum().float() * p.grad.data
                                 # p.grad2_acc += prob[:, y].sum().float() * p.grad.data.pow(2)
                                 p.grad2_acc += prob[:, y].sum().float() * p.grad.data * p.grad.data
-                        model.zero_grad()  # 清除累积的梯度
+                        model.zero_grad()
         for p in model.parameters():
             p.grad_acc /= len(train_loader)
             p.grad2_acc /= len(train_loader)
@@ -835,7 +831,7 @@ class FisherTrainBatchProcessor():
 
 class DevBatchProcessor():
     """
-    正常的测试过程
+    test
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -864,12 +860,12 @@ class DevBatchProcessor():
             num += len(head)
             pred = model.predict(head, relation)
             batch_size_range = torch.arange(pred.size()[0], device=self.args.device)
-            target_pred = pred[batch_size_range, tail] # 取出本三元组tail的分数
-            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred) # 将其他tail分数全部设为负无穷
-            pred[batch_size_range, tail] = target_pred # 还原本三元组tail的分数
+            target_pred = pred[batch_size_range, tail]
+            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred)
+            pred[batch_size_range, tail] = target_pred
             """ rank all candidate entities """
             ranks = 1 + torch.argsort(torch.argsort(pred, dim=1, descending=True), dim=1, descending=False)[batch_size_range, tail]
-            ranks = ranks.float() # 已经取出了所有的正确尾实体的排名, (batch_size, 1)
+            ranks = ranks.float()
             results['count'] = torch.numel(ranks) + results.get('count', 0.0)
             results['mr'] = torch.sum(ranks).item() + results.get('mr', 0.0)
             results['mrr'] = torch.sum(1.0 / ranks).item() + results.get('mrr', 0.0)
@@ -886,7 +882,7 @@ class DevBatchProcessor():
 
 class ForgetDevBatchProcessor():
     """
-    遗忘集的测试过程
+    test for forgetting set
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -915,12 +911,12 @@ class ForgetDevBatchProcessor():
             num += len(head)
             pred = model.predict(head, relation)
             batch_size_range = torch.arange(pred.size()[0], device=self.args.device)
-            target_pred = pred[batch_size_range, tail] # 取出本三元组tail的分数
-            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred) # 将其他tail分数全部设为负无穷
-            pred[batch_size_range, tail] = target_pred # 还原本三元组tail的分数
+            target_pred = pred[batch_size_range, tail]
+            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred)
+            pred[batch_size_range, tail] = target_pred
             """ rank all candidate entities """
             ranks = 1 + torch.argsort(torch.argsort(pred, dim=1, descending=True), dim=1, descending=False)[batch_size_range, tail]
-            ranks = ranks.float() # 已经取出了所有的正确尾实体的排名, (batch_size, 1)
+            ranks = ranks.float()
             results['count'] = torch.numel(ranks) + results.get('count', 0.0)
             results['mr'] = torch.sum(ranks).item() + results.get('mr', 0.0)
             results['mrr'] = torch.sum(1.0 / ranks).item() + results.get('mrr', 0.0)
@@ -937,7 +933,7 @@ class ForgetDevBatchProcessor():
 
 class ReserveDevBatchProcessor():
     """
-    保留集的测试过程
+    test for reservation
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -966,12 +962,12 @@ class ReserveDevBatchProcessor():
             num += len(head)
             pred = model.predict(head, relation)
             batch_size_range = torch.arange(pred.size()[0], device=self.args.device)
-            target_pred = pred[batch_size_range, tail] # 取出本三元组tail的分数
-            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred) # 将其他tail分数全部设为负无穷
-            pred[batch_size_range, tail] = target_pred # 还原本三元组tail的分数
+            target_pred = pred[batch_size_range, tail]
+            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred)
+            pred[batch_size_range, tail] = target_pred
             """ rank all candidate entities """
             ranks = 1 + torch.argsort(torch.argsort(pred, dim=1, descending=True), dim=1, descending=False)[batch_size_range, tail]
-            ranks = ranks.float() # 已经取出了所有的正确尾实体的排名, (batch_size, 1)
+            ranks = ranks.float()
             results['count'] = torch.numel(ranks) + results.get('count', 0.0)
             results['mr'] = torch.sum(ranks).item() + results.get('mr', 0.0)
             results['mrr'] = torch.sum(1.0 / ranks).item() + results.get('mrr', 0.0)
