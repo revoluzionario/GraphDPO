@@ -143,7 +143,7 @@ class ParameterPerturber:
 
     def zerolike_params_dict(self, model: torch.nn) -> Dict[str, torch.Tensor]:
         """
-        Taken from: Avalanche: an End-to-End Library for Continual Learning - https://github.com/ContinualAI/avalanche
+        Taken from: Avalanche: an End-to-End Library for Continual Learning
         Returns a dict like named_parameters(), with zeroed-out parameter valuse
         Parameters:
         model (torch.nn): model to get param dict from
@@ -198,7 +198,7 @@ class ParameterPerturber:
 
     def calc_importance(self, dataloader: DataLoader) -> Dict[str, torch.Tensor]:
         """
-        Adapated from: Avalanche: an End-to-End Library for Continual Learning - https://github.com/ContinualAI/avalanche
+        Adapated from: Avalanche: an End-to-End Library for Continual Learning
         Calculate per-parameter, importance
             returns a dictionary [param_name: list(importance per parameter)]
         Parameters:
@@ -275,7 +275,7 @@ class ParameterPerturber:
 
 class SSDTrainBatchProcessor():
     """
-    SSD: https://github.com/if-loops/selective-synaptic-dampening/blob/main/src/forget_random_strategies.py
+    SSD: From the original codes
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -402,7 +402,7 @@ class GraphDPOTrainBatchProcessor():
 
 class ADVIMPTrainBatchProcessor():
     """
-    ADV+IMP: https://openreview.net/forum?id=z8mVbZIMOjx
+    ADV+IMP: From the original codes
     """
     def __init__(self, args, kg, model) -> None:
         self.args = args
@@ -565,7 +565,7 @@ class FGSM(AttackBase):
 
 class BSTrainBatchProcessor():
     """
-    Boundary Shrink: https://github.com/TY-LEE-KR/Boundary-Unlearning-Code/blob/master/boundary_unlearning.py
+    Boundary Shrink
     """
     def __init__(self, args, kg) -> None:
         self.args = args
@@ -667,7 +667,7 @@ class BSTrainBatchProcessor():
 
 class FisherTrainBatchProcessor():
     """
-    Fisher: https://github.com/AdityaGolatkar/SelectiveForgetting/blob/master/Forgetting.ipynb
+    Fisher: From the original codes
     """
     # def __init__(self, args, kg) -> None:
     #     self.args = args
