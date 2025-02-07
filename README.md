@@ -13,7 +13,7 @@ The codes and datasets for "Unlearning of Knowledge Graph Embedding via Preferen
 The structure of the folder is shown below:
 
 ```
- IncDE
+ GraphDPO
  ├─checkpoint_pretrain
  ├─checkpoint_unlearning
  ├─data
@@ -34,9 +34,9 @@ Introduction to the structure of the folder:
 - /data: The datasets are stored in this folder.
 - /logs: Logs for the training are stored in this folder.
 - /src: Source codes are in this folder.
-- /main.py: To run the IncDE.
+- /main.py: To run the GraphDPO.
 - data_preprocess.py: To prepare the data processing.
-- README.md: Instruct on how to realize IncDE.
+- README.md: Instruct on how to realize GraphDPO.
 
 ## Folder Structure
 
