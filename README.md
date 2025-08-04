@@ -117,7 +117,7 @@ We evaluate GraphDPO on the following benchmark datasets:
 
 More static analysis  in the Appendix of our paper. 
 
-> **Notice**: Due to the large size of CO-10, CO-20, YA-10, and YA-20 datasets, we provide the complete datasets in the **supplementary materials**.
+> **Notice**: Due to the large size of YA-20 dataset (> 20 MB), we provide the complete datasets in this **anonymous github link**, but not the **Supplementary Materials (<= 50 MB)**.
 
 ### Baseline Methods
 
