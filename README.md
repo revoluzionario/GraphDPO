@@ -22,7 +22,11 @@ GraphDPO/
 │   ├── fb15k-237-10.zip
 │   ├── fb15k-237-20.zip
 │   ├── wn18rr-10.zip
-│   └── wn18rr-20.zip
+│   ├── wn18rr-20.zip
+│   ├── CoDEx-L-10.zip
+│   ├── CoDEx-L-20.zip
+│   ├── YAGO3-10-10.zip
+│   └── YAGO3-10-20.zip
 ├── 📂 logs/                    # Training logs
 ├── 📂 src/                     # Source code
 │   ├── 📂 data_load/          # Data loading utilities
@@ -71,6 +75,10 @@ unzip fb15k-237-10.zip
 unzip fb15k-237-20.zip  
 unzip wn18rr-10.zip
 unzip wn18rr-20.zip
+unzip CoDEx-L-10.zip
+unzip CoDEx-L-20.zip
+unzip YAGO3-10-10.zip
+unzip YAGO3-10-20.zip
 cd ..
 ```
 
