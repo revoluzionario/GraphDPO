@@ -35,9 +35,11 @@ class Instructor():
         if not os.path.exists(self.args.pretrain_save_path):
             os.mkdir(self.args.pretrain_save_path)
         """ Set device """
-        torch.cuda.set_device(int(self.args.gpu))
-        _ = torch.tensor([1]).cuda()
-        self.args.device = _.device
+        if torch.cuda.is_available():
+            torch.cuda.set_device(int(self.args.gpu))
+            self.args.device = torch.device(f"cuda:{self.args.gpu}")
+        else:
+            self.args.device = torch.device("cpu")
         print(self.args.device)
         """ 2. Define data """
         self.kg = PretrainData(self.args)
@@ -153,7 +155,7 @@ class Instructor():
     def load_checkpoint(self, input_file):
         if os.path.isfile(input_file):
             logging.info(f"=> loading checkpoint \'{input_file}\'")
-            checkpoint = torch.load(input_file, map_location=f"cuda:{self.args.gpu}")
+            checkpoint = torch.load(input_file, map_location=self.args.device)
             self.model.load_state_dict(checkpoint['state_dict'])
         else:
             logging.info(f'=> no checking found at \'{input_file}\'')

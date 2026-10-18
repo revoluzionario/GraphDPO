@@ -51,8 +51,8 @@ GraphDPO/
 - Sufficient GPU memory for large knowledge graphs
 
 ### Software
-- Python 3.9
-- PyTorch 1.13.1
+- Python 3.12+
+- PyTorch 2.14.1
 - CUDA-compatible GPU drivers
 
 ## ⚡ Quick Start

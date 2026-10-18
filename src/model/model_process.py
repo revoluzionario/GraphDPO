@@ -437,9 +437,10 @@ class ADVIMPTrainBatchProcessor():
             r = r.to(device)
             t = t.to(device)
             y = y.to(device)
-            attack_label = torch.rand(h.shape[0]).cuda() * 10
+            attack_label = torch.rand(h.shape[0], device=self.args.device) * 10
             attack_label = attack_label.to(torch.long)
-            attack_label = torch.where(attack_label == t, (torch.rand(h.shape[0]).long().cuda()*10 + 10) // 2, attack_label)
+            fallback_labels = (torch.rand(h.shape[0], device=self.args.device).long() * 10 + 10) // 2
+            attack_label = torch.where(attack_label == t, fallback_labels, attack_label)
             h_embeds = torch.index_select(self.model.ent_embeddings.weight, 0, h)
             r_embeds = torch.index_select(self.model.rel_embeddings.weight, 0, r)
             input_embeds = torch.cat([h_embeds, r_embeds], 0)
@@ -581,7 +582,7 @@ class BSTrainBatchProcessor():
         )
 
     def PM(self, logit, target):
-        eye = torch.eye(logit.shape[1]).cuda()
+        eye = torch.eye(logit.shape[1], device=logit.device)
         probs_GT = (logit.softmax(1) * eye[target]).sum(1).detach()
         top2_probs = logit.softmax(1).topk(2, largest=True)
         GT_in_top2_ind = (top2_probs[1] == target.view(-1, 1)).float().sum(1) == 1

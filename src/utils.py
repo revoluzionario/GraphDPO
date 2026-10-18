@@ -22,7 +22,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from prettytable import PrettyTable
-from advertorch.attacks import L2PGDAttack
 from torch.cuda.amp import autocast, GradScaler
 
 def get_datetime():
