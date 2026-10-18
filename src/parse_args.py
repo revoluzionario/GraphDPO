@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(
 
 # global setting
 parser.add_argument("-data_path", dest="data_path", default="./data/", help="Path of data")
-parser.add_argument("-data_name", dest="data_name", default="fb15k-237-1", help="Name of data")
+parser.add_argument("-data_name", dest="data_name", default="fb15k-237-10", help="Name of data")
 parser.add_argument("-pretrain_save_path", dest="pretrain_save_path", default="./checkpoint_pretrain", help="Path of checkpoint for pretrain")
 parser.add_argument("-unlearning_save_path", dest="unlearning_save_path", default="./checkpoint_unlearning", help="Path of checkpoint for unleanring")
 parser.add_argument("-log_path", dest="log_path", default="./logs/", help="Path of logs")
